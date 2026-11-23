@@ -75,12 +75,9 @@
     color: var(--muted);
     font: inherit;
     font-size: 14px;
-    transition: color 150ms ease;
   }
 
-  nav button:hover {
-    color: var(--terracotta);
-  }
+  nav button:hover { color: var(--terracotta); }
 
   nav button.active {
     color: var(--brown);
@@ -141,13 +138,6 @@
     color: var(--brown);
   }
 
-  .note h2 {
-    font-size: 17px;
-    line-height: 1.4;
-    font-weight: normal;
-    margin: 0 0 10px;
-  }
-
   .note p {
     margin: 0 0 18px;
     white-space: pre-wrap;
@@ -173,9 +163,7 @@
   }
 
   @media (max-width: 900px) {
-    .grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .layout {
       gap: 28px;
       grid-template-columns: 125px minmax(0, 1fr);
@@ -202,7 +190,6 @@
       padding: 17px 15px;
       min-height: 155px;
     }
-    .note h2 { font-size: 16px; }
   }
 
   @media (max-width: 380px) {
@@ -288,11 +275,7 @@ function render() {
   visible.forEach(note => {
     const article = makeElement("article", "note");
 
-    article.appendChild(makeElement("h2", "", note.title));
-
-    if (note.content) {
-      article.appendChild(makeElement("p", "", note.content));
-    }
+    article.appendChild(makeElement("p", "", note.content));
 
     const meta = makeElement("div", "meta");
     const details = [...note.topics];
@@ -349,9 +332,8 @@ async function loadNotes() {
       } catch (error) {}
 
       return {
-        title: String(row["Title"] || "Untitled").trim(),
         content: String(row["Note"] || "").trim(),
-        topics: String(row["Topics"] || "")
+        topics: String(row["topic"] || "")
           .split(",")
           .map(topic => topic.trim())
           .filter(Boolean),
