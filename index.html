@@ -4,7 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>dump4noor — NOOR'S DUMP</title>
+<title>Noor's Dump</title>
+
 <style>
   :root {
     --cream: #fae3b1;
@@ -75,9 +76,12 @@
     color: var(--muted);
     font: inherit;
     font-size: 14px;
+    transition: color 150ms ease;
   }
 
-  nav button:hover { color: var(--terracotta); }
+  nav button:hover {
+    color: var(--terracotta);
+  }
 
   nav button.active {
     color: var(--brown);
@@ -138,6 +142,13 @@
     color: var(--brown);
   }
 
+  .note h2 {
+    font-size: 17px;
+    line-height: 1.4;
+    font-weight: normal;
+    margin: 0 0 10px;
+  }
+
   .note p {
     margin: 0 0 18px;
     white-space: pre-wrap;
@@ -163,7 +174,9 @@
   }
 
   @media (max-width: 900px) {
-    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
     .layout {
       gap: 28px;
       grid-template-columns: 125px minmax(0, 1fr);
@@ -172,24 +185,30 @@
 
   @media (max-width: 600px) {
     body { padding: 35px 22px; }
+
     .layout {
       grid-template-columns: 1fr;
       gap: 24px;
     }
+
     nav {
       position: static;
       flex-direction: row;
       flex-wrap: wrap;
       gap: 8px 17px;
     }
+
     .grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
     }
+
     .note {
       padding: 17px 15px;
       min-height: 155px;
     }
+
+    .note h2 { font-size: 16px; }
   }
 
   @media (max-width: 380px) {
@@ -199,8 +218,9 @@
 </head>
 
 <body>
+
 <header>
-  <h1>NOOR'S DUMP</h1>
+  <h1>Noor's Dump ⋆｡°✩</h1>
   <div class="intro">a small collection of things i want to remember</div>
 </header>
 
@@ -238,6 +258,7 @@ function render() {
     selected === "all" ? "active" : "",
     "all notes"
   );
+
   allButton.dataset.topic = "all";
   topicNav.appendChild(allButton);
 
@@ -247,6 +268,7 @@ function render() {
       selected === topic ? "active" : "",
       topic
     );
+
     button.dataset.topic = topic;
     topicNav.appendChild(button);
   });
@@ -275,7 +297,15 @@ function render() {
   visible.forEach(note => {
     const article = makeElement("article", "note");
 
-    article.appendChild(makeElement("p", "", note.content));
+    article.appendChild(
+      makeElement("h2", "", note.title)
+    );
+
+    if (note.description) {
+      article.appendChild(
+        makeElement("p", "", note.description)
+      );
+    }
 
     const meta = makeElement("div", "meta");
     const details = [...note.topics];
@@ -326,13 +356,30 @@ async function loadNotes() {
 
       try {
         const parsedLink = new URL(rawLink);
-        if (parsedLink.protocol === "https:" || parsedLink.protocol === "http:") {
+
+        if (
+          parsedLink.protocol === "https:" ||
+          parsedLink.protocol === "http:"
+        ) {
           safeLink = parsedLink.href;
         }
       } catch (error) {}
 
+      const description = String(
+        row["Description"] || row["Note"] || ""
+      ).trim();
+
+      const title = String(row["Title"] || "").trim()
+        || (
+          description
+            ? description.slice(0, 48) +
+              (description.length > 48 ? "…" : "")
+            : "A little note"
+        );
+
       return {
-        content: String(row["Note"] || "").trim(),
+        title: title,
+        description: description,
         topics: String(row["topic"] || "")
           .split(",")
           .map(topic => topic.trim())
@@ -359,5 +406,6 @@ async function loadNotes() {
 
 loadNotes();
 </script>
+
 </body>
 </html>
