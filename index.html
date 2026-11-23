@@ -4,63 +4,213 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notes</title>
+<title>dump4noor — notes</title>
 <style>
+  :root {
+    --cream: #fae3b1;
+    --olive: #998731;
+    --blue: #5fa8c2;
+    --terracotta: #CF5527;
+    --red: #7d2027;
+    --brown: #673c34;
+    --background: #faf9f6;
+    --ink: #39332e;
+    --muted: #968d80;
+  }
+
   * { box-sizing: border-box; }
+
   body {
     margin: 0;
     padding: 55px 7%;
-    background: #faf9f6;
-    color: #33332f;
+    background: var(--background);
+    color: var(--ink);
     font-family: Georgia, serif;
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.7;
   }
-  header { margin-bottom: 32px; }
-  h1 { font-size: 29px; font-weight: normal; margin: 0; }
-  .intro { color: #888; font-size: 14px; margin-top: 5px; }
+
+  header {
+    max-width: 1100px;
+    margin: 0 auto 38px;
+  }
+
+  h1 {
+    font-size: 30px;
+    font-weight: normal;
+    letter-spacing: -0.5px;
+    margin: 0;
+  }
+
+  .intro {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 4px;
+  }
+
   .layout {
     display: grid;
-    grid-template-columns: 155px 1fr;
-    gap: 55px;
-    max-width: 950px;
+    grid-template-columns: 145px minmax(0, 1fr);
+    gap: 42px;
+    max-width: 1100px;
+    margin: 0 auto;
+    align-items: start;
   }
-  nav { display: flex; flex-direction: column; gap: 9px; }
+
+  nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 9px;
+    position: sticky;
+    top: 30px;
+  }
+
   nav button {
     border: 0;
     background: none;
     padding: 0;
     text-align: left;
     cursor: pointer;
-    color: #888;
+    color: var(--muted);
     font: inherit;
     font-size: 14px;
+    transition: color 150ms ease;
   }
-  nav button:hover, nav button.active {
-    color: #333;
+
+  nav button:hover {
+    color: var(--terracotta);
+  }
+
+  nav button.active {
+    color: var(--brown);
     text-decoration: underline;
+    text-decoration-color: var(--olive);
+    text-underline-offset: 4px;
   }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 19px;
+    align-items: stretch;
+  }
+
   .note {
-    padding: 0 0 23px;
-    margin-bottom: 22px;
-    border-bottom: 1px solid #e9e6df;
+    padding: 22px 20px 18px;
+    min-height: 175px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(80, 60, 40, 0.07);
+    box-shadow: 0 3px 9px rgba(65, 56, 40, 0.07);
+    transition: transform 180ms ease, box-shadow 180ms ease;
   }
+
+  .note:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 15px rgba(65, 56, 40, 0.11);
+  }
+
+  .note:nth-child(6n + 1) {
+    background: var(--cream);
+    color: var(--brown);
+  }
+
+  .note:nth-child(6n + 2) {
+    background: #f0edda;
+    color: var(--brown);
+  }
+
+  .note:nth-child(6n + 3) {
+    background: #e0edf0;
+    color: #284d5b;
+  }
+
+  .note:nth-child(6n + 4) {
+    background: #f2e2d9;
+    color: var(--brown);
+  }
+
+  .note:nth-child(6n + 5) {
+    background: #eadcdd;
+    color: var(--red);
+  }
+
+  .note:nth-child(6n + 6) {
+    background: #e9dfd9;
+    color: var(--brown);
+  }
+
   .note h2 {
     font-size: 17px;
+    line-height: 1.4;
     font-weight: normal;
-    margin: 0 0 5px;
+    margin: 0 0 10px;
   }
-  .note p { margin: 0 0 8px; white-space: pre-wrap; }
-  .meta { color: #999; font: 12px Arial, sans-serif; }
-  .meta a { color: inherit; }
-  .empty { color: #888; font-size: 14px; }
+
+  .note p {
+    margin: 0 0 18px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .meta {
+    color: var(--muted);
+    font: 11px/1.6 Arial, sans-serif;
+    margin-top: auto;
+    padding-top: 10px;
+  }
+
+  .meta a {
+    color: var(--terracotta);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .empty {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .layout {
+      gap: 28px;
+      grid-template-columns: 125px minmax(0, 1fr);
+    }
+  }
+
   @media (max-width: 600px) {
-    body { padding: 30px 22px; }
-    .layout { grid-template-columns: 1fr; gap: 25px; }
-    nav { flex-direction: row; flex-wrap: wrap; gap: 8px 16px; }
+    body { padding: 35px 22px; }
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    nav {
+      position: static;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 8px 17px;
+    }
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .note {
+      padding: 17px 15px;
+      min-height: 155px;
+    }
+    .note h2 { font-size: 16px; }
+  }
+
+  @media (max-width: 380px) {
+    .grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
+
 <body>
 <header>
   <h1>notes</h1>
@@ -71,7 +221,8 @@
   <nav id="topics">
     <button class="active" data-topic="all">all notes</button>
   </nav>
-  <main id="notes">
+
+  <main id="notes" class="grid">
     <p class="empty">Loading notes...</p>
   </main>
 </div>
@@ -90,16 +241,20 @@ function makeElement(tag, className, text) {
 }
 
 function render() {
-  const topicList = [...new Set(notes.flatMap(note => note.topics))].sort();
+  const allTopics = [...new Set(notes.flatMap(note => note.topics))].sort();
 
   const topicNav = document.getElementById("topics");
   topicNav.replaceChildren();
 
-  const allButton = makeElement("button", selected === "all" ? "active" : "", "all notes");
+  const allButton = makeElement(
+    "button",
+    selected === "all" ? "active" : "",
+    "all notes"
+  );
   allButton.dataset.topic = "all";
   topicNav.appendChild(allButton);
 
-  topicList.forEach(topic => {
+  allTopics.forEach(topic => {
     const button = makeElement(
       "button",
       selected === topic ? "active" : "",
@@ -143,7 +298,6 @@ function render() {
     const details = [...note.topics];
 
     if (note.date) details.push(note.date);
-
     meta.textContent = details.join(" · ");
 
     if (note.link) {
@@ -179,24 +333,20 @@ async function loadNotes() {
   try {
     const response = await fetch(FEED_URL);
 
-    if (!response.ok) {
-      throw new Error("Could not load notes.");
-    }
+    if (!response.ok) throw new Error("Could not load notes.");
 
     const rows = await response.json();
 
     notes = rows.map(row => {
       const rawLink = String(row["Link"] || "").trim();
-
       let safeLink = "";
+
       try {
         const parsedLink = new URL(rawLink);
         if (parsedLink.protocol === "https:" || parsedLink.protocol === "http:") {
           safeLink = parsedLink.href;
         }
-      } catch (error) {
-        safeLink = "";
-      }
+      } catch (error) {}
 
       return {
         title: String(row["Title"] || "Untitled").trim(),
