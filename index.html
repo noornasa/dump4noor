@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,13 +27,29 @@
   }
   nav { display: flex; flex-direction: column; gap: 9px; }
   nav button {
-    border: 0; background: none; padding: 0;
-    text-align: left; cursor: pointer;
-    color: #888; font: inherit; font-size: 14px;
+    border: 0;
+    background: none;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+    color: #888;
+    font: inherit;
+    font-size: 14px;
   }
-  nav button:hover, nav button.active { color: #333; text-decoration: underline; }
-  .note { padding: 0 0 23px; margin-bottom: 22px; border-bottom: 1px solid #e9e6df; }
-  .note h2 { font-size: 17px; font-weight: normal; margin: 0 0 5px; }
+  nav button:hover, nav button.active {
+    color: #333;
+    text-decoration: underline;
+  }
+  .note {
+    padding: 0 0 23px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid #e9e6df;
+  }
+  .note h2 {
+    font-size: 17px;
+    font-weight: normal;
+    margin: 0 0 5px;
+  }
   .note p { margin: 0 0 8px; white-space: pre-wrap; }
   .meta { color: #999; font: 12px Arial, sans-serif; }
   .meta a { color: inherit; }
@@ -55,66 +72,160 @@
     <button class="active" data-topic="all">all notes</button>
   </nav>
   <main id="notes">
-    <article class="note">
-      <h2>Welcome to my notes</h2>
-      <p>A little corner of the internet for things I come across, ideas I want to explore, and things I don't want to forget.</p>
-      <div class="meta">getting started · example note</div>
-    </article>
-    <article class="note">
-      <h2>More to come</h2>
-      <p>Books, places, articles, thoughts, recipes, and everything in between.</p>
-      <div class="meta">getting started · example note</div>
-    </article>
+    <p class="empty">Loading notes...</p>
   </main>
 </div>
 
 <script>
-const notes = [
-  {
-    title: "Welcome to my notes",
-    content: "A little corner of the internet for things I come across, ideas I want to explore, and things I don't want to forget.",
-    topics: ["getting started"],
-    date: "example note"
-  },
-  {
-    title: "More to come",
-    content: "Books, places, articles, thoughts, recipes, and everything in between.",
-    topics: ["getting started"],
-    date: "example note"
-  }
-];
+const FEED_URL = "https://script.google.com/macros/s/AKfycbzPC4DfTjpkfD35cihU_WZSWFoBhLZ8rTBt-hsQQzteojCQGZ40d10xag4vBtL9Kb0C/exec";
 
+let notes = [];
 let selected = "all";
 
-function render() {
-  const allTopics = [...new Set(notes.flatMap(n => n.topics))].sort();
-  document.getElementById("topics").innerHTML =
-    `<button data-topic="all" class="${selected === "all" ? "active" : ""}">all notes</button>` +
-    allTopics.map(t =>
-      `<button data-topic="${t}" class="${selected === t ? "active" : ""}">${t}</button>`
-    ).join("");
+function makeElement(tag, className, text) {
+  const element = document.createElement(tag);
+  if (className) element.className = className;
+  if (text !== undefined) element.textContent = text;
+  return element;
+}
 
-  document.querySelectorAll("#topics button").forEach(button => {
-    button.onclick = () => {
+function render() {
+  const topicList = [...new Set(notes.flatMap(note => note.topics))].sort();
+
+  const topicNav = document.getElementById("topics");
+  topicNav.replaceChildren();
+
+  const allButton = makeElement("button", selected === "all" ? "active" : "", "all notes");
+  allButton.dataset.topic = "all";
+  topicNav.appendChild(allButton);
+
+  topicList.forEach(topic => {
+    const button = makeElement(
+      "button",
+      selected === topic ? "active" : "",
+      topic
+    );
+    button.dataset.topic = topic;
+    topicNav.appendChild(button);
+  });
+
+  topicNav.querySelectorAll("button").forEach(button => {
+    button.addEventListener("click", () => {
       selected = button.dataset.topic;
       render();
-    };
+    });
   });
 
   const visible = selected === "all"
     ? notes
-    : notes.filter(n => n.topics.includes(selected));
+    : notes.filter(note => note.topics.includes(selected));
 
-  document.getElementById("notes").innerHTML = visible.length
-    ? visible.map(n => `
-      <article class="note">
-        <h2>${n.title}</h2>
-        <p>${n.content}</p>
-        <div class="meta">${n.topics.join(" · ")} · ${n.date}</div>
-      </article>`).join("")
-    : '<p class="empty">No notes in this topic yet.</p>';
+  const notesArea = document.getElementById("notes");
+  notesArea.replaceChildren();
+
+  if (visible.length === 0) {
+    notesArea.appendChild(
+      makeElement("p", "empty", "No notes in this topic yet.")
+    );
+    return;
+  }
+
+  visible.forEach(note => {
+    const article = makeElement("article", "note");
+
+    article.appendChild(makeElement("h2", "", note.title));
+
+    if (note.content) {
+      article.appendChild(makeElement("p", "", note.content));
+    }
+
+    const meta = makeElement("div", "meta");
+    const details = [...note.topics];
+
+    if (note.date) details.push(note.date);
+
+    meta.textContent = details.join(" · ");
+
+    if (note.link) {
+      const link = document.createElement("a");
+      link.href = note.link;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = details.length ? " · open link" : "open link";
+      meta.appendChild(link);
+    }
+
+    article.appendChild(meta);
+    notesArea.appendChild(article);
+  });
 }
-render();
+
+function formatDate(value) {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  });
+}
+
+async function loadNotes() {
+  const notesArea = document.getElementById("notes");
+
+  try {
+    const response = await fetch(FEED_URL);
+
+    if (!response.ok) {
+      throw new Error("Could not load notes.");
+    }
+
+    const rows = await response.json();
+
+    notes = rows.map(row => {
+      const rawLink = String(row["Link"] || "").trim();
+
+      let safeLink = "";
+      try {
+        const parsedLink = new URL(rawLink);
+        if (parsedLink.protocol === "https:" || parsedLink.protocol === "http:") {
+          safeLink = parsedLink.href;
+        }
+      } catch (error) {
+        safeLink = "";
+      }
+
+      return {
+        title: String(row["Title"] || "Untitled").trim(),
+        content: String(row["Note"] || "").trim(),
+        topics: String(row["Topics"] || "")
+          .split(",")
+          .map(topic => topic.trim())
+          .filter(Boolean),
+        link: safeLink,
+        date: formatDate(row["Timestamp"]),
+        sortDate: new Date(row["Timestamp"]).getTime() || 0
+      };
+    });
+
+    notes.sort((a, b) => b.sortDate - a.sortDate);
+    render();
+
+  } catch (error) {
+    notesArea.replaceChildren(
+      makeElement(
+        "p",
+        "empty",
+        "Couldn't load notes right now. Please try refreshing the page."
+      )
+    );
+  }
+}
+
+loadNotes();
 </script>
 </body>
 </html>
