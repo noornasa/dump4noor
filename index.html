@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 55px 7%;
+    background: #faf9f6;
+    color: #33332f;
+    font-family: Georgia, serif;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  header { margin-bottom: 32px; }
+  h1 { font-size: 29px; font-weight: normal; margin: 0; }
+  .intro { color: #888; font-size: 14px; margin-top: 5px; }
+  .layout {
+    display: grid;
+    grid-template-columns: 155px 1fr;
+    gap: 55px;
+    max-width: 950px;
+  }
+  nav { display: flex; flex-direction: column; gap: 9px; }
+  nav button {
+    border: 0; background: none; padding: 0;
+    text-align: left; cursor: pointer;
+    color: #888; font: inherit; font-size: 14px;
+  }
+  nav button:hover, nav button.active { color: #333; text-decoration: underline; }
+  .note { padding: 0 0 23px; margin-bottom: 22px; border-bottom: 1px solid #e9e6df; }
+  .note h2 { font-size: 17px; font-weight: normal; margin: 0 0 5px; }
+  .note p { margin: 0 0 8px; white-space: pre-wrap; }
+  .meta { color: #999; font: 12px Arial, sans-serif; }
+  .meta a { color: inherit; }
+  .empty { color: #888; font-size: 14px; }
+  @media (max-width: 600px) {
+    body { padding: 30px 22px; }
+    .layout { grid-template-columns: 1fr; gap: 25px; }
+    nav { flex-direction: row; flex-wrap: wrap; gap: 8px 16px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>notes</h1>
+  <div class="intro">a small collection of things i want to remember</div>
+</header>
+
+<div class="layout">
+  <nav id="topics">
+    <button class="active" data-topic="all">all notes</button>
+  </nav>
+  <main id="notes">
+    <article class="note">
+      <h2>Welcome to my notes</h2>
+      <p>A little corner of the internet for things I come across, ideas I want to explore, and things I don't want to forget.</p>
+      <div class="meta">getting started · example note</div>
+    </article>
+    <article class="note">
+      <h2>More to come</h2>
+      <p>Books, places, articles, thoughts, recipes, and everything in between.</p>
+      <div class="meta">getting started · example note</div>
+    </article>
+  </main>
+</div>
+
+<script>
+const notes = [
+  {
+    title: "Welcome to my notes",
+    content: "A little corner of the internet for things I come across, ideas I want to explore, and things I don't want to forget.",
+    topics: ["getting started"],
+    date: "example note"
+  },
+  {
+    title: "More to come",
+    content: "Books, places, articles, thoughts, recipes, and everything in between.",
+    topics: ["getting started"],
+    date: "example note"
+  }
+];
+
+let selected = "all";
+
+function render() {
+  const allTopics = [...new Set(notes.flatMap(n => n.topics))].sort();
+  document.getElementById("topics").innerHTML =
+    `<button data-topic="all" class="${selected === "all" ? "active" : ""}">all notes</button>` +
+    allTopics.map(t =>
+      `<button data-topic="${t}" class="${selected === t ? "active" : ""}">${t}</button>`
+    ).join("");
+
+  document.querySelectorAll("#topics button").forEach(button => {
+    button.onclick = () => {
+      selected = button.dataset.topic;
+      render();
+    };
+  });
+
+  const visible = selected === "all"
+    ? notes
+    : notes.filter(n => n.topics.includes(selected));
+
+  document.getElementById("notes").innerHTML = visible.length
+    ? visible.map(n => `
+      <article class="note">
+        <h2>${n.title}</h2>
+        <p>${n.content}</p>
+        <div class="meta">${n.topics.join(" · ")} · ${n.date}</div>
+      </article>`).join("")
+    : '<p class="empty">No notes in this topic yet.</p>';
+}
+render();
+</script>
+</body>
+</html>
