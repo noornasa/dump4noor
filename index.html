@@ -94,14 +94,15 @@
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 19px;
-    align-items: stretch;
+    align-items: start;
   }
 
-  .note {
-    padding: 22px 20px 18px;
-    min-height: 175px;
-    display: flex;
-    flex-direction: column;
+ .note {
+  padding: 22px 20px 18px;
+  min-height: 0;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
     border: 1px solid rgba(80, 60, 40, 0.07);
     box-shadow: 0 3px 9px rgba(65, 56, 40, 0.07);
     transition: transform 180ms ease, box-shadow 180ms ease;
@@ -206,9 +207,9 @@
     }
 
     .note {
-      padding: 17px 15px;
-      min-height: 155px;
-    }
+  padding: 17px 15px;
+  min-height: 0;
+}
 
     .note h2 { font-size: 16px; }
   }
