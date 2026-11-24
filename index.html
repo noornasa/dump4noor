@@ -275,21 +275,14 @@ function getPhotoUrl(value) {
   const raw = String(value || "").trim();
   if (!raw) return "";
 
-  try {
-    const url = new URL(raw);
+  const match = raw.match(/[?&]id=([^&]+)/) ||
+                raw.match(/\/file\/d\/([^/]+)/);
 
-    if (url.hostname !== "drive.google.com") return "";
+  if (!match) return "";
 
-    const id = url.searchParams.get("id") ||
-      (url.pathname.match(/\/file\/d\/([^/]+)/) || [])[1];
+  const id = decodeURIComponent(match[1]);
 
-    if (!id) return "";
-
-    return "https://drive.google.com/uc?export=view&id=" +
-      encodeURIComponent(id);
-  } catch (error) {
-    return "";
-  }
+  return "https://lh3.googleusercontent.com/d/" + id;
 }
 
 function getLinks(value) {
@@ -401,7 +394,7 @@ function render() {
       makeElement("div", "topic-label", details.join(" · "))
     );
 
-    // Multiple links
+// Multiple links
     if (note.links.length > 0) {
       const linkArea = makeElement("div", "note-links");
 
@@ -420,7 +413,7 @@ function render() {
         linkArea.appendChild(link);
       });
 
-      meta.appendChild(linkArea);
+      article.appendChild(linkArea);
     }
 
     article.appendChild(meta);
